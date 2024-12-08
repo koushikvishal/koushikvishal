@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+struct AppointmentSlot 
+{ int slotNumber;
+char timing[20];
+};
+struct Patient { int patientID; char name[50]; int age;
+char gender[10];
+char illness[50];
+char appointmentDate[20]; int appointmentSlot; struct Patient* next;
+};
+struct Patient* head = NULL;
+// Function to check if the appointment date is available
+bool checkAvailability(char appointmentDate[], int appointmentSlot) {
+struct Patient* current = head;
+// Traverse the list to check each patient's appointment date and slot while (current != NULL) {
+// If the date and slot are already booked, return false
+if (strcmp(current->appointmentDate, appointmentDate) == 0 &&
+current->appointmentSlot == appointmentSlot) {
+return false; }
+     
+                current = current->next; }
+// If the date and slot are available, return true
+return true; }
+// Function to display available appointment slots for a selected day void displayAvailableSlots(char appointmentDate[]) {
+struct AppointmentSlot availableSlots[] = { {1, "9:00 AM"},
+{2, "10:00 AM"},
+{3, "11:00 AM"},
+{4, "2:00 PM"},
+{5, "3:00 PM"} };
+int maxSlots = sizeof(availableSlots) / sizeof(availableSlots[0]); int bookedSlots[maxSlots]; // Array to track booked slots
+// Initialize booked slots array for (int i = 0; i < maxSlots; ++i) {
+bookedSlots[i] = 0; }
+struct Patient* current = head;
+// Traverse the list to mark booked slots for the selected day while (current != NULL) {
+if (strcmp(current->appointmentDate, appointmentDate) == 0) { bookedSlots[current->appointmentSlot - 1] = 1; // Mark the slot as booked
+}
+current = current->next; }
+// Display available slots for the selected day
+printf("Available appointment slots for %s:\n", appointmentDate); for (int i = 0; i < maxSlots; ++i) {
+if (bookedSlots[i] == 0) {
+     
+                printf("%d. Slot %d (%s)\n", i + 1, availableSlots[i].slotNumber, availableSlots[i].timing); }
+} }
+// Function to book an appointment slot
+void bookAppointmentSlot(struct Patient* newPatient) {
+struct AppointmentSlot availableSlots[] = { {1, "9:00 AM"},
+{2, "10:00 AM"},
+{3, "11:00 AM"},
+{4, "2:00 PM"},
+{5, "3:00 PM"} };
+int maxSlots = sizeof(availableSlots) / sizeof(availableSlots[0]);
+// Prompt the user to choose an available slot until a valid slot is entered while (1) {
+printf("Available slots for %s:\n", newPatient->appointmentDate); displayAvailableSlots(newPatient->appointmentDate); printf("Choose an available slot (1-%d): ", maxSlots);
+scanf("%d", &newPatient->appointmentSlot);
+// Check if the slot is available
+if (newPatient->appointmentSlot >= 1 && newPatient->appointmentSlot <= maxSlots &&
+checkAvailability(newPatient->appointmentDate, newPatient->appointmentSlot)) {
+break; } else {
+printf("Invalid slot or slot already booked. Please choose a different slot.\n"); }
+} }
+// Function to add a new patient to the system
+void insertPatient(int patientID, char name[], int age, char gender[], char illness[]) {
+struct Patient* newPatient = (struct Patient*)malloc(sizeof(struct Patient)); newPatient->patientID = patientID;
+     
+                strcpy(newPatient->name, name); newPatient->age = age; strcpy(newPatient->gender, gender); strcpy(newPatient->illness, illness);
+// Prompt the user to schedule an appointment until a valid date is entered while (1) {
+printf("Enter appointment date (YYYY-MM-DD): "); scanf("%s", newPatient->appointmentDate);
+// Check if the date is available
+if (checkAvailability(newPatient->appointmentDate, 0)) {
+break; } else {
+printf("Appointment date is not available. Please choose a different date.\n"); }
+}
+// Book an appointment slot for the patient bookAppointmentSlot(newPatient);
+// Add the new patient to the list newPatient->next = head;
+head = newPatient;
+printf("Patient with ID %d added.\n", patientID); }
+void deletePatient(int patientID) { // ... (unchanged)
+}
+void searchPatient(int patientID) { // ... (unchanged)
+}
+void displayPatients() { // ... (unchanged)
+}
+     
+                int main() {
+int choice, patientID, age;
+char name[50], gender[10], illness[50];
+while (1) {
+printf("\nHospital Management System\n"); printf("1. Add a patient\n");
+printf("2. Delete a patient\n");
+printf("3. Search for a patient\n");
+printf("4. Display all patients\n");
+printf("5. Exit\n");
+printf("Enter your choice: ");
+scanf("%d", &choice);
+switch (choice) { case 1: {
+printf("Enter patient ID: "); scanf("%d", &patientID); printf("Enter patient name: "); scanf("%s", name); printf("Enter patient age: "); scanf("%d", &age); printf("Enter patient gender: "); scanf("%s", gender); printf("Enter patient illness: "); scanf("%s", illness);
+insertPatient(patientID, name, age, gender, illness);
+break; }
+case 2: {
+printf("Enter patient ID to delete: "); scanf("%d", &patientID); deletePatient(patientID);
+break;
+}
+case 3: {
+printf("Enter patient ID to search: ");
+     
+                scanf("%d", &patientID); searchPatient(patientID); break;
+}
+case 4: {
+displayPatients();
+break; }
+case 5: exit(0);
+default:
+printf("Invalid choice. Please try again.\n");
+} }
+return 0; }
